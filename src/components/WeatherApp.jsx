@@ -11,10 +11,10 @@ import { useEffect } from "react";
 
 
 const WeatherApp = () => {
-    const [data, setData] = useState({
-    })
+    const [data, setData] = useState({})
     const [location, setLocation] = useState("")
-    // const [unit, setUnit] = useState("") to change from metric to imperial
+    const [unit, setUnit] = useState("metric")
+    const [symbol, setSymbol] = useState("℃")
     const [image, setImage] = useState("")
     const [weatherImages, setWeatherImages] = useState({
         Clear: sunny,
@@ -52,8 +52,7 @@ const WeatherApp = () => {
             //Don't have API key in front end. Send request to server to retrive and send data back
             const defaultLocaiton = "London"
             const api_key = (`1a4893e623e96cd7639831669ed3f3d0`)
-            const defaultUnits = (`metric`)
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${defaultLocaiton}&units=${defaultUnits}&appid=${api_key}`
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${defaultLocaiton}&units=${unit}&appid=${api_key}`
             try {
                 const result = await fetch(url)
                 const data = await result.json();
@@ -80,6 +79,9 @@ const WeatherApp = () => {
             search()
         }
     }
+    function handleClick(e) {
+        setUnit(e.target.value)
+    }
 
     async function search() {
 
@@ -87,8 +89,7 @@ const WeatherApp = () => {
             //Don't have API key in front end. Send request to server to retrive and send data back
             setLoading(true)
             const api_key = (`1a4893e623e96cd7639831669ed3f3d0`)
-            const units = (`metric`)
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${units}&appid=${api_key}`
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=${unit}&appid=${api_key}`
             try {
                 const result = await fetch(url)
                 const data = await result.json();
@@ -103,6 +104,13 @@ const WeatherApp = () => {
                     setImage(weatherimage)
                     setLocation("")
                     setLoading(false)
+                    if (unit == "metric") {
+                        setSymbol("℃")
+                    } else if (unit == "standard") {
+                        setSymbol("K");
+                    } else {
+                        setSymbol("℉")
+                    }
                 }
 
             }
@@ -133,6 +141,19 @@ const WeatherApp = () => {
                             onKeyDown={handleKeyDown} />
                         <i className="fa-solid fa-magnifying-glass" onClick={search}></i>
                     </div>
+
+                    <div className="search-under">
+
+                        <input type="radio" name="unit" value="metric" id="metric" onChange={handleClick} />
+                        <label htmlFor="metric">Metric</label>
+                        <input type="radio" name="unit" value="standard" id="kelvin" onChange={handleClick} />
+                        <label htmlFor="kelvin">Kelvin</label>
+                        <input type="radio" name="unit" value="imperial" id="imperial" onChange={handleClick} />
+                        <label htmlFor="kelvin">Imperial</label>
+
+
+
+                    </div>
                 </div>
 
 
@@ -142,7 +163,7 @@ const WeatherApp = () => {
                             <div className="weather">
                                 <img src={image ? image : sunny} alt="Image of the weather" />
                                 <div className="weather-type">{data.weather ? `${data.weather[0].main}` : null}</div>
-                                <div className="temp">{data.main ? `${Math.floor(data.main.temp)}℃` : null}</div>
+                                <div className="temp">{data.main ? `${Math.floor(data.main.temp)}${symbol}` : null}</div>
                             </div>
                             <div className="weather-date">
                                 <p>{getDate()}</p>
